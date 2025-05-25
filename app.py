@@ -19,7 +19,7 @@ with st.form("formulario"):
     estres = st.selectbox("Nivel de estrés académico:", ["Bajo", "Medio", "Alto"])
     sueno = st.number_input("¿Cuántas horas duerme al día?", min_value=3, max_value=10)
     solvente = st.selectbox("¿Está solvente con la universidad?", ["Sí", "No"])
-    tiene_trabajo = st.selectbox("¿Trabaja actualmente?", ["Sí", "No"])
+    tiene_trabajo = st.selectbox("¿Su familia lo apoya para pagar la universidad?", ["Sí", "No"])
     
     submit = st.form_submit_button("Predecir")
 
