@@ -7,44 +7,42 @@ from tensorflow.keras.models import load_model
 model = load_model("modelo_abandono.h5")
 scaler = joblib.load("scaler.pkl")
 
-st.title("Predicción de Abandono Académico")
+st.title("🔍 Predicción de Abandono Universitario")
 
-# Inputs del usuario
+st.markdown("Completa el siguiente formulario con tus datos:")
+
 with st.form("formulario"):
-    asistencia = st.selectbox("¿Asiste regularmente a clases dominicales?", ["Sí", "No"])
-    tareas = st.selectbox("¿Con qué frecuencia entrega sus tareas a tiempo?", ["Siempre", "A veces", "Rara vez", "Nunca"])
-    reprobadas = st.number_input("¿Cuántas materias ha reprobado?", min_value=0)
-    traslado = st.number_input("¿Cuántos minutos tarda en llegar a la universidad?", min_value=1)
-    trabajo = st.selectbox("¿Tiene empleo actualmente?", ["Sí", "No"])
-    estres = st.selectbox("Nivel de estrés académico:", ["Bajo", "Medio", "Alto"])
-    sueno = st.number_input("¿Cuántas horas duerme al día?", min_value=3, max_value=10)
-    solvente = st.selectbox("¿Está solvente con la universidad?", ["Sí", "No"])
-    tiene_trabajo = st.selectbox("¿Su familia lo apoya para pagar la universidad?", ["Sí", "No"])
-    
+    estudios_previos = st.selectbox("¿Usted tiene estudios universitarios?", ["Sí", "No"])
+    inscrito = st.selectbox("¿Está inscrito en la Universidad actualmente?", ["Sí", "No"])
+    reprobado = st.selectbox("¿Ha reprobado alguna materia?", ["Sí", "No"])
+    solvente = st.selectbox("¿Está solvente actualmente con la Universidad?", ["Sí", "No"])
+    empleo = st.selectbox("¿Tienes empleo actualmente?", ["Sí", "No"])
+    traslado = st.slider("¿Cuánto tiempo tardas en llegar a la universidad? (en horas)", 0.0, 5.0, 1.0, step=0.5)
+
     submit = st.form_submit_button("Predecir")
 
 if submit:
-    map_bin = {"Sí": 1, "No": 0}
-    map_tareas = {"Siempre": 1.0, "A veces": 0.7, "Rara vez": 0.4, "Nunca": 0.0}
-    map_estres = {"Bajo": 0.2, "Medio": 0.5, "Alto": 0.8}
+    # Codificar respuestas
+    map_si_no = {"Sí": 1, "No": 0}
 
-    datos = np.array([[ 
-        map_bin[asistencia],
-        map_tareas[tareas],
-        reprobadas,
-        traslado,
-        map_bin[trabajo],
-        map_estres[estres],
-        sueno,
-        map_bin[solvente],
-        map_bin[tiene_trabajo]
+    datos = np.array([[
+        map_si_no[estudios_previos],
+        map_si_no[inscrito],
+        map_si_no[reprobado],
+        map_si_no[solvente],
+        map_si_no[empleo],
+        traslado
     ]])
-    
+
+    # Escalar datos
     datos_escalados = scaler.transform(datos)
+
+    # Predecir
     prob = model.predict(datos_escalados)[0][0]
 
     st.write(f"📊 Probabilidad de abandono: **{prob:.2%}**")
+
     if prob > 0.5:
-        st.error("🔴 Riesgo ALTO de abandono")
+        st.error("🔴 Riesgo ALTO de abandono universitario.")
     else:
-        st.success("🟢 Riesgo BAJO de abandono")
+        st.success("🟢 Riesgo BAJO de abandono universitario.")
